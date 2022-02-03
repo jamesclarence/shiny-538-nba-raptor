@@ -17,7 +17,19 @@ ui <- fluidPage(
   titlePanel("Shiny App: FiveThirtyEight's Best NBA Players"),
   
   sidebarLayout(sidebarPanel(
-    h2("A Shiny app by James Fisher")
+    h2("A Shiny app by James Fisher"),
+    selectInput("var", 
+                label = "NBA Teams",
+                choices = list("Percent White", 
+                               "Percent Black",
+                               "Percent Hispanic", 
+                               "Percent Asian"),
+                selected = "Percent White"),
+    
+    sliderInput("range", 
+                label = "Minimum Minutes Played",
+                min = 0, max = 100, value = c(0, 100)),
+    textInput("Search Player", label = h3("Search for a Player"), value = "Search for a player..."),
   ),
                 mainPanel(
                   h1("FiveThirtyEight's Best NBA Players, According to Raptor"),
@@ -31,11 +43,20 @@ ui <- fluidPage(
 
 # Define server logic ----
 server <- function(input, output) {
-  
+
 }
 
 # Run the app ----
 shinyApp(ui = ui, server = server)
+
+
+# Design
+# sliderInput - Minutes
+# selectInput - Teams
+# textInput - Names
+
+
+
 
 # https://github.com/fivethirtyeight/data/tree/master/nba-raptor
 
