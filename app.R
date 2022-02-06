@@ -26,6 +26,10 @@ ui <- fluidPage(
   
   sidebarLayout(sidebarPanel(
     h2("A Shiny app by James Fisher"),
+    sliderInput("range", 
+                label = "Minimum Minutes Played",
+                min = 0, max = max(current_raptor$mp), value = c(0, max(current_raptor$mp))),
+    br(),
     selectInput("var", 
                 label = "NBA Teams",
                 choices = list("Percent White", 
@@ -33,11 +37,8 @@ ui <- fluidPage(
                                "Percent Hispanic", 
                                "Percent Asian"),
                 selected = "Percent White"),
-    
-    sliderInput("range", 
-                label = "Minimum Minutes Played",
-                min = 0, max = 5000, value = c(0, 5000)),
-    textInput("Search Player", label = h3("Search for a Player"), value = "Search for a player..."),
+    br(),
+    textInput("SearchPlayer", label = h3("Search for a Player"), value = "Search for a player..."),
   ),
     mainPanel(
       h1("FiveThirtyEight's Best NBA Players, According to Raptor"),
@@ -55,9 +56,6 @@ ui <- fluidPage(
 
 # Define server logic ----
 server <- function(input, output) {
-
-  # Change player list by Team
-  # output$var <- 
   
   # Change player list by Minute Range  
   output$range <- renderText({ 
@@ -67,28 +65,10 @@ server <- function(input, output) {
   
   # Render a data table of all results from current_raptor data frame
   output$table <- renderTable(
-    current_raptor
+    #current_raptor[which(current_raptor$mp <= input$range[2] & current_raptor$mp >= input$range[1])]
+    filter(current_raptor, current_raptor$mp <= input$range[2] & current_raptor$mp >= input$range[1])
   )
 }
 
 # Run the app ----
 shinyApp(ui = ui, server = server)
-
-
-# Design
-# sliderInput - Minutes
-# selectInput - Teams
-# textInput - Names
-
-
-
-
-# https://github.com/fivethirtyeight/data/tree/master/nba-raptor
-
-# Current 2022 season RAPTOR
-# https://projects.fivethirtyeight.com/nba-model/2022/latest_RAPTOR_by_player.csv
-# 
-# current_raptor_url <- "https://projects.fivethirtyeight.com/nba-model/2022/latest_RAPTOR_by_player.csv"
-# 
-# # Read CSV and add today's date
-# current_raptor <- read_csv(current_raptor_url) %>% mutate(date=Sys.Date())
