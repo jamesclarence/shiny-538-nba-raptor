@@ -18,7 +18,7 @@ library(tidyverse)
 current_raptor_url <- "https://projects.fivethirtyeight.com/nba-model/2022/latest_RAPTOR_by_team.csv"
 
 # Read CSV and add today's date
-current_raptor <- read_csv(current_raptor_url) %>% mutate(date=Sys.Date())
+current_raptor <- read_csv(current_raptor_url) %>% arrange(desc(mp))
 
 # Define UI ----
 ui <- fluidPage(
@@ -30,15 +30,9 @@ ui <- fluidPage(
                 label = "Minimum Minutes Played",
                 min = 0, max = max(current_raptor$mp), value = c(0, max(current_raptor$mp))),
     br(),
-    selectInput("var", 
+    selectInput("team", 
                 label = "NBA Teams",
-                choices = list("Percent White", 
-                               "Percent Black",
-                               "Percent Hispanic", 
-                               "Percent Asian"),
-                selected = "Percent White"),
-    br(),
-    textInput("SearchPlayer", label = h3("Search for a Player"), value = "Search for a player..."),
+                choices = current_raptor$team),
   ),
     mainPanel(
       h1("FiveThirtyEight's Best NBA Players, According to Raptor"),
@@ -63,10 +57,11 @@ server <- function(input, output) {
           input$range[1], "to", input$range[2])
   })
   
-  # Render a data table of all results from current_raptor data frame
+  # Change data based on minutes range and team selection
   output$table <- renderTable(
-    #current_raptor[which(current_raptor$mp <= input$range[2] & current_raptor$mp >= input$range[1])]
-    filter(current_raptor, current_raptor$mp <= input$range[2] & current_raptor$mp >= input$range[1])
+    filter(current_raptor, 
+           (current_raptor$mp <= input$range[2] & current_raptor$mp >= input$range[1]) &
+             current_raptor$team == input$team)
   )
 }
 
