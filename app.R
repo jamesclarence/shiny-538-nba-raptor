@@ -71,11 +71,21 @@ server <- function(input, output) {
   
   # Change data based on minutes range and team selection
   output$table <- renderTable(
-    filter(current_raptor, 
+    filter(current_raptor,
            (current_raptor$mp <= input$range[2] & current_raptor$mp >= input$range[1]) &
              current_raptor$team == input$team)
   )
+
 }
+
+# https://stackoverflow.com/questions/47624161/use-filter-in-dplyr-conditional-on-an-if-statement-in-r
+
+# output$table <- renderTable(
+# current_raptor %>%
+#   {if (input$team == "All") current_raptor else filter(., current_raptor$team == input$team)}
+# 
+# )
+
 
 # Run the app ----
 shinyApp(ui = ui, server = server)
