@@ -18,7 +18,16 @@ library(tidyverse)
 current_raptor_url <- "https://projects.fivethirtyeight.com/nba-model/2022/latest_RAPTOR_by_team.csv"
 
 # Read CSV and add today's date
-current_raptor <- read_csv(current_raptor_url) %>% arrange(desc(mp))
+current_raptor <- read_csv(current_raptor_url) %>% 
+  select(player_name,
+         team,
+         mp,
+         raptor_offense,
+         raptor_defense,
+         raptor_total,
+         war_total
+  ) %>% 
+  arrange(team, desc(war_total, raptor_total, raptor_offense, raptor_defense))
 
 # Define UI ----
 ui <- fluidPage(
@@ -32,7 +41,8 @@ ui <- fluidPage(
     br(),
     selectInput("team", 
                 label = "NBA Teams",
-                choices = current_raptor$team),
+                choices = c("All", current_raptor$team)
+                ),
   ),
     mainPanel(
       h1("FiveThirtyEight's Best NBA Players, According to Raptor"),
@@ -44,6 +54,8 @@ ui <- fluidPage(
       textOutput("range"),
       br(),
       tableOutput("table") ## reference current_raptor data frame
+      
+      # DT::dataTableOutput("table") # DataTables table output
     )
   )
 )
@@ -67,3 +79,12 @@ server <- function(input, output) {
 
 # Run the app ----
 shinyApp(ui = ui, server = server)
+
+# DataTable example https://shiny.rstudio.com/gallery/basic-datatable.html
+  # output$table <- DT::renderDataTable(DT::datatable({ 
+  #   data <- current_raptor
+  #   if (input$team != "All") {
+  #     data <- data[data$team == input$team,]
+  #   }
+  #   data
+  # }))
