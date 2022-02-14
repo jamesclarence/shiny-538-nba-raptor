@@ -1,12 +1,9 @@
 # Shiny App: 538 NBA Raptor
 # https://projects.fivethirtyeight.com/nba-player-ratings/
 
-
-# https://shiny.rstudio.com/tutorial/
-# runExample("01_hello")
-
 # Load packages -----
 library(shiny)
+library(shinyWidgets)
 library(tidyverse)
 
 # Source helper functions -----
@@ -22,10 +19,10 @@ current_raptor <- read_csv(current_raptor_url) %>%
   select(player_name,
          team,
          mp,
-         raptor_offense,
-         raptor_defense,
+         war_total,
          raptor_total,
-         war_total
+         raptor_offense,
+         raptor_defense
   ) %>% 
   arrange(team, desc(war_total, raptor_total, raptor_offense, raptor_defense))
 
@@ -54,8 +51,6 @@ ui <- fluidPage(
       textOutput("range"),
       br(),
       tableOutput("table") ## reference current_raptor data frame
-      
-      # DT::dataTableOutput("table") # DataTables table output
     )
   )
 )
@@ -70,31 +65,15 @@ server <- function(input, output) {
   })
   
   # Change data based on minutes range and team selection
-  output$table <- renderTable(
-    filter(current_raptor,
-           (current_raptor$mp <= input$range[2] & current_raptor$mp >= input$range[1]) &
-             current_raptor$team == input$team)
-  )
+  # SO help: https://stackoverflow.com/questions/56319618/implement-select-all-option-in-reactive-shiny
+  filtered <- reactive({
+    rows <- (input$team == "All" | current_raptor$team == input$team) &
+      (current_raptor$mp <= input$range[2] & current_raptor$mp >= input$range[1])
+    current_raptor[rows,,drop = FALSE]
+  })
+  output$table <- renderTable(filtered())
 
 }
 
-# https://stackoverflow.com/questions/47624161/use-filter-in-dplyr-conditional-on-an-if-statement-in-r
-
-# output$table <- renderTable(
-# current_raptor %>%
-#   {if (input$team == "All") current_raptor else filter(., current_raptor$team == input$team)}
-# 
-# )
-
-
 # Run the app ----
 shinyApp(ui = ui, server = server)
-
-# DataTable example https://shiny.rstudio.com/gallery/basic-datatable.html
-  # output$table <- DT::renderDataTable(DT::datatable({ 
-  #   data <- current_raptor
-  #   if (input$team != "All") {
-  #     data <- data[data$team == input$team,]
-  #   }
-  #   data
-  # }))
