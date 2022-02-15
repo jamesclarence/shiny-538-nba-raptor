@@ -69,7 +69,7 @@ server <- function(input, output) {
   filtered <- reactive({
     rows <- (input$team == "All" | current_raptor$team == input$team) &
       (current_raptor$mp <= input$range[2] & current_raptor$mp >= input$range[1])
-    current_raptor[rows,,drop = FALSE]
+    current_raptor[rows,,drop = FALSE] %>% arrange(desc(war_total, raptor_total, raptor_offense, raptor_defense))
   })
   output$table <- renderTable(filtered())
 
