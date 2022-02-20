@@ -24,11 +24,16 @@ current_raptor <- read_csv(current_raptor_url) %>%
          raptor_offense,
          raptor_defense
   ) %>% 
-  arrange(team, desc(war_total, raptor_total, raptor_offense, raptor_defense))
+  arrange(team, desc(war_total), desc(raptor_total), desc(raptor_offense), desc(raptor_defense)) %>% 
+  mutate(rank_nba = min_rank(desc(war_total))) %>%
+  group_by(team) %>% 
+  mutate(rank_team = min_rank(desc(war_total))) %>% 
+  ungroup() %>% 
+  select(rank_nba, rank_team, everything())
 
 # Define UI ----
 ui <- fluidPage(
-  titlePanel("Shiny App: FiveThirtyEight's Best NBA Players"),
+  titlePanel("Shiny App: FiveThirtyEight's Best NBA Players, According to Raptor"),
   
   sidebarLayout(sidebarPanel(
     h2("A Shiny app by James Fisher"),
@@ -40,17 +45,13 @@ ui <- fluidPage(
                 label = "NBA Teams",
                 choices = c("All", current_raptor$team)
                 ),
-  ),
-    mainPanel(
-      h1("FiveThirtyEight's Best NBA Players, According to Raptor"),
-      br(),
       p("For FiveThirtyEight's RAPTOR site, ",
         a("click here.", 
           href = "https://projects.fivethirtyeight.com/nba-player-ratings/")),
-      br(),
-      textOutput("range"),
-      br(),
-      tableOutput("table") ## reference current_raptor data frame
+  ),
+    mainPanel(
+      # tableOutput("table") ## reference current_raptor data frame
+      gt_output(outputId = "table") # GT Table
     )
   )
 )
@@ -69,9 +70,22 @@ server <- function(input, output) {
   filtered <- reactive({
     rows <- (input$team == "All" | current_raptor$team == input$team) &
       (current_raptor$mp <= input$range[2] & current_raptor$mp >= input$range[1])
-    current_raptor[rows,,drop = FALSE] %>% arrange(desc(war_total, raptor_total, raptor_offense, raptor_defense))
+    current_raptor[rows,,drop = FALSE] %>% arrange(desc(war_total), desc(raptor_total), desc(raptor_offense), desc(raptor_defense))
   })
-  output$table <- renderTable(filtered())
+  # output$table <- renderTable(filtered(),  
+  #                             striped = TRUE,  
+  #                             hover = TRUE)
+  
+  output$table <-
+    render_gt(
+      expr = filtered() %>% 
+        gt() %>% # add gt table
+        fmt_number(
+          columns = 6:9,
+          decimals = 1
+        ) %>% 
+        gt_theme_538()
+    )
 
 }
 
