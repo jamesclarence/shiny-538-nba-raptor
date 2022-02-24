@@ -48,6 +48,9 @@ ui <- fluidPage(
       p("For FiveThirtyEight's RAPTOR site, ",
         a("click here.", 
           href = "https://projects.fivethirtyeight.com/nba-player-ratings/")),
+      p("RAPTOR: Robust Algorithm (using) Player Tracking (and) On/Off Ratings.
+        According to 538, RAPTOR is 'a plus-minus statistic that measures the number of points a player contributes to his team's offense and defense per 100 possessions, relative to a league-average player.'"),
+      p("WAR: Wins Above Replacement. How many wins a player will contribute compared to a replacement-level player, which 538 determines to be -2.75 points per 100 possessions.")
   ),
     mainPanel(
       # tableOutput("table") ## reference current_raptor data frame
@@ -84,8 +87,15 @@ server <- function(input, output) {
           columns = 6:9,
           decimals = 1
         ) %>% 
-        gt_theme_538()
-    )
+        gt_theme_538() %>% 
+        tab_spanner(
+          label = "OVERALL RAPTOR",
+          columns = c(raptor_total, raptor_offense, raptor_defense)) %>% 
+        tab_spanner(
+          label = "WAR RANKING",
+          columns = c(rank_nba, rank_team)
+      )
+      )
 
 }
 
