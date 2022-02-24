@@ -6,9 +6,6 @@ library(shiny)
 library(shinyWidgets)
 library(tidyverse)
 
-# Source helper functions -----
-#source("helpers.R")
-
 # Download 538 RAPTOR data ------------------------------------------------
 
 # Current RAPTOR CSV
@@ -53,7 +50,6 @@ ui <- fluidPage(
       p("WAR: Wins Above Replacement. How many wins a player will contribute compared to a replacement-level player, which 538 determines to be -2.75 points per 100 possessions.")
   ),
     mainPanel(
-      # tableOutput("table") ## reference current_raptor data frame
       gt_output(outputId = "table") # GT Table
     )
   )
@@ -75,9 +71,6 @@ server <- function(input, output) {
       (current_raptor$mp <= input$range[2] & current_raptor$mp >= input$range[1])
     current_raptor[rows,,drop = FALSE] %>% arrange(desc(war_total), desc(raptor_total), desc(raptor_offense), desc(raptor_defense))
   })
-  # output$table <- renderTable(filtered(),  
-  #                             striped = TRUE,  
-  #                             hover = TRUE)
   
   output$table <-
     render_gt(
@@ -94,9 +87,24 @@ server <- function(input, output) {
         tab_spanner(
           label = "WAR RANKING",
           columns = c(rank_nba, rank_team)
-      )
-      )
-
+      ) %>% 
+        tab_style(
+          style = list(
+            cell_fill(color = "darkgrey"),
+            cell_text(weight = "bold",
+                      color = "white")
+          ),
+          locations = cells_column_labels(
+            columns = war_total
+          )
+        ) %>% 
+        data_color(
+          columns = c(raptor_total, raptor_offense, raptor_defense),
+          colors = scales::col_numeric(
+            palette = c("pink", "white", "lightblue"),
+            domain = NULL)
+        )
+    )
 }
 
 # Run the app ----
