@@ -36,7 +36,9 @@ ui <- fluidPage(
     h2("A Shiny app by James Fisher"),
     sliderInput("range", 
                 label = "Minimum Minutes Played",
-                min = 0, max = max(current_raptor$mp), value = c(0, max(current_raptor$mp))),
+                min = 0, 
+                max = max(current_raptor$mp), 
+                value = c(815, max(current_raptor$mp))),
     br(),
     selectInput("team", 
                 label = "NBA Teams",
@@ -103,6 +105,9 @@ server <- function(input, output) {
           colors = scales::col_numeric(
             palette = c("pink", "white", "lightblue"),
             domain = NULL)
+        ) %>% 
+        cols_align(
+          align = "center"
         )
     )
 }
