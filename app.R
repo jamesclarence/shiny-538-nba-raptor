@@ -5,6 +5,8 @@
 library(shiny)
 library(shinyWidgets)
 library(tidyverse)
+library(gt)
+library(gtExtras)
 
 # Download 538 RAPTOR data ------------------------------------------------
 
@@ -114,3 +116,21 @@ server <- function(input, output) {
 
 # Run the app ----
 shinyApp(ui = ui, server = server)
+
+# Chart
+# current_raptor %>%
+#   filter(mp > 829) %>% 
+#   ggplot() + 
+#   geom_rect(aes(
+#     xmin = 0, xmax = 10, ymin = 0, ymax = 10),
+#     fill = "lightblue"
+#   ) +  
+#   geom_rect(aes(
+#     xmin = 0, xmax = -10, ymin = 0, ymax = -10),
+#     fill = "pink"
+#   ) +
+#   geom_point(aes(x = raptor_offense,
+#                  y = raptor_defense),
+#              shape = 21, colour = "black", fill = "white", size = 5, stroke = 2) +
+#   xlim(-10, 10) +
+#   ylim(-10, 10)
