@@ -32,10 +32,11 @@ current_raptor <- read_csv(current_raptor_url) %>%
 
 # Define UI ----
 ui <- fluidPage(
-  titlePanel("Shiny App: FiveThirtyEight's Best NBA Players, According to Raptor"),
+  titlePanel("Shiny App: FiveThirtyEight's Best NBA Players, According to RAPTOR"),
   
   sidebarLayout(sidebarPanel(
-    h2("A Shiny app by James Fisher"),
+    h2("A Shiny app by ", a("@jamesclarence", 
+          href = "https://github.com/jamesclarence/shiny-538-nba-raptor")),
     sliderInput("range", 
                 label = "Minimum Minutes Played",
                 min = 0, 
@@ -126,11 +127,20 @@ server <- function(input, output) {
           xmin = 0, xmax = -10, ymin = 0, ymax = -10),
           fill = "pink"
         ) +
+        # geom_rect(aes(
+        #   xmin = 0, xmax = -10, ymin = 0, ymax = 10),
+        #   fill = "white"
+        # ) +
+        # geom_rect(aes(
+        #   xmin = 0, xmax = 10, ymin = 0, ymax = -10),
+        #   fill = "white"
+        # ) +
         geom_point(aes(x = raptor_offense,
                        y = raptor_defense),
                    shape = 21, colour = "black", fill = "white", size = 5, stroke = 2) +
         xlim(-10, 10) +
-        ylim(-10, 10)
+        ylim(-10, 10) +
+        theme_minimal()
     )
 }
 
