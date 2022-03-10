@@ -127,14 +127,6 @@ server <- function(input, output) {
           xmin = 0, xmax = -10, ymin = 0, ymax = -10),
           fill = "pink"
         ) +
-        # geom_rect(aes(
-        #   xmin = 0, xmax = -10, ymin = 0, ymax = 10),
-        #   fill = "white"
-        # ) +
-        # geom_rect(aes(
-        #   xmin = 0, xmax = 10, ymin = 0, ymax = -10),
-        #   fill = "white"
-        # ) +
         geom_point(aes(x = raptor_offense,
                        y = raptor_defense),
                    shape = 21, colour = "black", fill = "white", size = 5, stroke = 2) +
